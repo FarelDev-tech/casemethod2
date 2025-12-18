@@ -1,3 +1,10 @@
+// UPDATE
+/*
+Menambahkan:
+- Menambahkan fitur untuk menghitung dan menampilkan jumlah total pendaftar dari semester 6 dan 7 secara terpisah
+- Update Status: Membuat fungsi lagi untuk mengubah status magang mahasiswa tertentu dengan mencari berdasarkan NIM
+*/
+
 import java.util.Scanner;
 
 public class CM2Magang08 {
@@ -85,9 +92,9 @@ public class CM2Magang08 {
             System.out.println("Belum ada pendaftar.");
         } else {
             // Menampilkan data
-            System.out.printf("%-22s %-15s %-21s %-20s %-10s %-20s\n", "Nama Mahasiswa", "NIM", "Program Studi", "Perusahaan Tujuan Magang", "Semester", "Status Magang");
+            System.out.printf("%-22s %-15s %-20s %-20s %-8s %-10s\n", "Nama Mahasiswa", "NIM", "Program Studi", "Perusahaan Tujuan Magang", "Semester", "Status Magang");
             for (int i = 0; i < totalPendaftar; i++) {
-                System.out.printf("%-22s %-15s %-21s %-20s %-10s %-20s\n", dataMagang[i][0], dataMagang[i][1], dataMagang[i][2], dataMagang[i][3], dataMagang[i][4], dataMagang[i][5]);
+                System.out.printf("%-22s %-15s %-20s %-20s %-8s %-10s\n", dataMagang[i][0], dataMagang[i][1], dataMagang[i][2], dataMagang[i][3], dataMagang[i][4], dataMagang[i][5]);
             }
         }
     }
@@ -96,27 +103,31 @@ public class CM2Magang08 {
     static void cariProgramStudi() {
         Scanner sc = new Scanner(System.in);
         String cariProdi;
+        boolean ditemukan = false; // Penanda ketemu
 
         System.out.print("Masukkan Program Studi yang dicari: ");
-        cariProdi = sc.nextLine();
+        cariProdi = sc.nextLine().trim();
 
         System.out.println("-- Hasil Pencarian --");
-        // Pengondisian untuk mencari data menggunakan nest loop
-        if (totalPendaftar == 0) {
-            System.out.println("Data tidak Ditemukan");
-        } else {
-            System.out.printf("%-22s %-15s %-21s %-20s %-10s %-20s\n", "Nama Mahasiswa", "NIM", "Program Studi", "Perusahaan Tujuan Magang", "Semester", "Status Magang");
-            for (int i = 0; i < totalPendaftar; i++) {
-                if (dataMagang[i][2].equalsIgnoreCase(cariProdi)) {
-                    System.out.printf("%-22s %-15s %-21s %-20s %-10s %-20s\n", dataMagang[i][0], dataMagang[i][1], dataMagang[i][2], dataMagang[i][3], dataMagang[i][4], dataMagang[i][5]);
-                }
-            }
+        System.out.printf("%-22s %-15s %-20s %-20s %-8s %-10s\n", "Nama Mahasiswa", "NIM", "Program Studi", "Perusahaan Tujuan Magang", "Semester", "Status Magang");
+        // Loop pencarian
+        for (int i = 0; i < totalPendaftar; i++) {
+            if (dataMagang[i][2].equalsIgnoreCase(cariProdi)) {
+                System.out.printf("%-22s %-15s %-20s %-20s %-8s %-10s\n", dataMagang[i][0], dataMagang[i][1], dataMagang[i][2], dataMagang[i][3], dataMagang[i][4], dataMagang[i][5]);
+                ditemukan = true; // Tandai ketemu
+            } 
+        }
+
+        // Cek penanda setelah loop selesai
+        if (!ditemukan) {
+            System.out.println("Program Studi tidak ditemukan."); 
         }
     }
 
     // Fungsi hitung jumlah pendaftar
     static void hitungJumlahPendaftar() {
         int diterima = 0, menunggu = 0, ditolak = 0;
+        int sem6 = 0, sem7 = 0;
 
         // Pengondisian untuk menghitung status jumlah pendaftar
         for (int i = 0; i < totalPendaftar; i++) {
@@ -129,10 +140,52 @@ public class CM2Magang08 {
             }
         }
 
+        // Menghitung jumlah pendaftar semester 6 dan 7
+        for (int i = 0; i < totalPendaftar; i++) {
+            if (dataMagang[i][4].equals("6")) {
+                sem6++;
+            } else if (dataMagang[i][4].equals("7")) {
+                sem7++;
+            }
+        }
+
         System.out.println("-- Jumlah Status Pendaftar --");
         System.out.println("Diterima: " + diterima);
         System.out.println("Menunggu: " + menunggu);
         System.out.println("Ditolak: " + ditolak);
+
+        System.out.println("Total Pendaftar Semester 6: " + sem6);
+        System.out.println("Total Pendaftar Semester 7: " + sem7);
+    }
+
+    // fungsi baru update status magang berdasarkan NIM
+    static void updateStatusMagang() {
+        Scanner sc = new Scanner(System.in);
+        long cariNIM;
+        boolean ditemukan = false;
+
+        System.out.print("Masukka NIM berdasarkan yang ingin diupdate status magangnya: ");
+        cariNIM = sc.nextLong();
+
+        // buffering
+        sc.nextLine();
+
+        // Loop Pencarian NIM
+        for (int i = 0; i < totalPendaftar; i++) {
+            if (dataMagang[i][1].equalsIgnoreCase(String.valueOf(cariNIM))) {
+                System.out.print("Masukkan status magang baru (Diterima/Menunggu/Ditolak): ");
+                String statusBaru = sc.nextLine();
+                dataMagang[i][5] = statusBaru;
+                System.out.println("Status magang berhasil diupdate.");
+                ditemukan = true;
+                break;
+            };
+
+            // Cek penanda setelah loop selesai
+            if (!ditemukan) {
+                System.out.println("NIM tidak ditemukan.");
+            }
+        }
     }
 
     static void menu() {
@@ -146,8 +199,9 @@ public class CM2Magang08 {
             System.out.println("2. Tampilkan Data Magang");
             System.out.println("3. Cari Program Studi");
             System.out.println("4. Jumlah Status Pendaftar");
-            System.out.println("5. Keluar");
-            System.out.print("Pilihan menu(1-5): ");
+            System.out.println("5. Update Status Magang berdasarkan NIM");
+            System.out.println("6. Keluar");
+            System.out.print("Pilihan menu(1-6): ");
 
             menu = sc.nextInt();
 
@@ -166,11 +220,14 @@ public class CM2Magang08 {
                     hitungJumlahPendaftar();
                     break;
                 case 5:
+                    updateStatusMagang();
+                    break;
+                case 6:
                     System.out.println("Terima kasih telah menggunakan program ini.");
                     break;
                 default:
                     System.out.println("Menu tidak tersedia.");
             } 
-        } while (menu != 5);
+        } while (menu != 6);
     }
 }
